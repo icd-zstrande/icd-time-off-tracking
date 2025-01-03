@@ -102,7 +102,7 @@ const Employees = () => {
       </Typography>
 
       {employees.length === 0 ? (
-        <Typography>No employees found.</Typography>
+        <Typography>Have your employees add you as their manager in their Profile.</Typography>
       ) : (
         employees.map((employee) => (
           <Accordion key={employee.id} sx={{ mb: 2 }}>

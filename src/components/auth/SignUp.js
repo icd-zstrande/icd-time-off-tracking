@@ -18,6 +18,7 @@ import {
   Checkbox
 } from '@mui/material';
 import { toast } from 'react-toastify';
+import logo from '../../assets/image.png';
 
 const jobLevels = [
   { title: 'Managing Director', days: 30 },
@@ -84,7 +85,21 @@ const SignUp = () => {
   return (
     <Container component="main" maxWidth="xs">
       <Paper elevation={3} sx={{ p: 4, mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+          <img 
+            src={logo} 
+            alt="Logo" 
+            style={{ 
+              height: '64px', 
+              marginBottom: '16px',
+              width: 'auto'
+            }} 
+          />
+          <Typography component="h1" variant="h5">
+            Time Off Tracker
+          </Typography>
+        </Box>
+        <Typography component="h2" variant="h5">
           Sign Up
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>

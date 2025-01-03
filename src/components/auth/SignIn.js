@@ -4,6 +4,7 @@ import { auth } from '../../firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Paper } from '@mui/material';
 import { toast } from 'react-toastify';
+import logo from '../../assets/image.png';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -23,7 +24,21 @@ const SignIn = () => {
   return (
     <Container component="main" maxWidth="xs">
       <Paper elevation={3} sx={{ p: 4, mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+          <img 
+            src={logo} 
+            alt="Logo" 
+            style={{ 
+              height: '64px', 
+              marginBottom: '16px',
+              width: 'auto'
+            }} 
+          />
+          <Typography component="h1" variant="h5">
+            Time Off Tracker
+          </Typography>
+        </Box>
+        <Typography component="h2" variant="h5">
           Sign In
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
