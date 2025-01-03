@@ -5,71 +5,49 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { auth } from './firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import SignIn from './components/auth/SignIn';
-import SignUp from './components/auth/SignUp';
+import theme from './theme';
+import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
-import Layout from './components/Layout';
-import theme from './theme';
+import SignIn from './components/auth/SignIn';
+import SignUp from './components/auth/SignUp';
+import Employees from './components/Employees';
+import { useAuth } from './hooks/useAuth';
 
-// Protected Route component
-const ProtectedRoute = ({ children }) => {
-  const [user, loading] = useAuthState(auth);
+function App() {
+  const { user, loading } = useAuth();
 
   if (loading) {
     return null;
   }
 
-  if (!user) {
-    return <Navigate to="/signin" />;
-  }
-
-  return children;
-};
-
-function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Router>
-          <ToastContainer
+          <ToastContainer 
             position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
             theme="dark"
           />
           <Routes>
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
             <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </ProtectedRoute>
-              }
+              path="/signin"
+              element={user ? <Navigate to="/" /> : <SignIn />}
             />
             <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Profile />
-                  </Layout>
-                </ProtectedRoute>
-              }
+              path="/signup"
+              element={user ? <Navigate to="/" /> : <SignUp />}
             />
+            {user ? (
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/employees" element={<Employees />} />
+              </Route>
+            ) : (
+              <Route path="*" element={<Navigate to="/signin" />} />
+            )}
           </Routes>
         </Router>
       </LocalizationProvider>

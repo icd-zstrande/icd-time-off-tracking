@@ -1,54 +1,77 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink, useLocation, Outlet } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box, Container, Tabs, Tab } from '@mui/material';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
-import { toast } from 'react-toastify';
-import logo from '../assets/image.png';
+import { auth, db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
 
-const Layout = ({ children }) => {
+const Layout = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const [value, setValue] = useState(0);
+  const [isManager, setIsManager] = useState(false);
 
-  const handleLogout = async () => {
+  useEffect(() => {
+    const checkIfManager = async () => {
+      if (auth.currentUser) {
+        const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+        if (userDoc.exists()) {
+          setIsManager(userDoc.data().isManager || false);
+        }
+      }
+    };
+    checkIfManager();
+  }, []);
+
+  useEffect(() => {
+    // Map paths to tab indices
+    const pathToIndex = {
+      '/': 0,
+      '/profile': 1,
+      '/employees': 2
+    };
+    setValue(pathToIndex[location.pathname] || 0);
+  }, [location]);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const handleSignOut = async () => {
     try {
       await signOut(auth);
       navigate('/signin');
     } catch (error) {
-      toast.error('Error signing out');
+      console.error('Error signing out:', error);
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
         <Toolbar>
-          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-            <img 
-              src={logo} 
-              alt="Logo" 
-              style={{ 
-                height: '32px', 
-                marginRight: '12px',
-                width: 'auto'
-              }} 
-            />
-            <Typography variant="h6" component="div" sx={{ color: 'primary.main' }}>
-              Time Off Tracker
-            </Typography>
-          </Box>
-          <Button color="inherit" onClick={() => navigate('/')} sx={{ mx: 1 }}>
-            Dashboard
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/profile')} sx={{ mx: 1 }}>
-            Profile
-          </Button>
-          <Button color="primary" variant="outlined" onClick={handleLogout} sx={{ ml: 1 }}>
-            Logout
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Time Off Tracker
+          </Typography>
+          <Button color="inherit" onClick={handleSignOut}>
+            Sign Out
           </Button>
         </Toolbar>
+        <Tabs 
+          value={value} 
+          onChange={handleChange} 
+          centered
+          textColor="inherit"
+          indicatorColor="secondary"
+        >
+          <Tab label="Dashboard" component={RouterLink} to="/" />
+          <Tab label="Profile" component={RouterLink} to="/profile" />
+          {isManager && <Tab label="Employees" component={RouterLink} to="/employees" />}
+        </Tabs>
       </AppBar>
-      <Container component="main" sx={{ flexGrow: 1, py: 4 }}>
-        {children}
+      <Container sx={{ mt: 4 }}>
+        <Outlet />
       </Container>
     </Box>
   );

@@ -3,7 +3,20 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { 
+  TextField, 
+  Button, 
+  Container, 
+  Typography, 
+  Box, 
+  Paper, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel,
+  FormControlLabel,
+  Checkbox
+} from '@mui/material';
 import { toast } from 'react-toastify';
 
 const jobLevels = [
@@ -20,6 +33,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [jobLevel, setJobLevel] = useState('');
+  const [isManager, setIsManager] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -49,6 +63,8 @@ const SignUp = () => {
         jobLevel,
         totalDays: selectedLevel.days,
         usedDays: 0,
+        availableDays: selectedLevel.days,
+        isManager,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -127,6 +143,18 @@ const SignUp = () => {
               ))}
             </Select>
           </FormControl>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isManager}
+                onChange={(e) => setIsManager(e.target.checked)}
+                disabled={loading}
+                color="primary"
+              />
+            }
+            label="I am a manager"
+            sx={{ mt: 1, mb: 1 }}
+          />
           <Button
             type="submit"
             fullWidth

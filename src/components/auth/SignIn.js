@@ -14,7 +14,7 @@ const SignIn = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       toast.error(error.message);
     }

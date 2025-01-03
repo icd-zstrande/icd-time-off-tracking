@@ -292,6 +292,7 @@ const Dashboard = () => {
                 color="primary"
                 onClick={() => setShowAddDaysModal(true)}
                 fullWidth
+                sx={{ mt: 2 }}
               >
                 Additional Days
               </Button>
