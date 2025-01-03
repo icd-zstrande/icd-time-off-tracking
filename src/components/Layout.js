@@ -5,6 +5,7 @@ import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
+import logo from '../assets/image.png';
 
 const Layout = () => {
   const location = useLocation();
@@ -29,10 +30,10 @@ const Layout = () => {
     const pathToIndex = {
       '/': 0,
       '/profile': 1,
-      '/employees': 2
+      '/employees': isManager ? 2 : 0 // Default to Dashboard if not a manager
     };
     setValue(pathToIndex[location.pathname] || 0);
-  }, [location]);
+  }, [location, isManager]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -50,25 +51,36 @@ const Layout = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Time Off Tracker
-          </Typography>
+        <Toolbar sx={{ minHeight: '64px' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+            <img 
+              src={logo} 
+              alt="Logo" 
+              style={{ 
+                height: '32px', 
+                marginRight: '12px',
+                width: 'auto'
+              }} 
+            />
+            <Typography variant="h6" component="div">
+              Time Off Tracker
+            </Typography>
+          </Box>
+          <Tabs 
+            value={value} 
+            onChange={handleChange} 
+            textColor="inherit"
+            indicatorColor="secondary"
+            sx={{ flexGrow: 1 }}
+          >
+            <Tab label="Dashboard" component={RouterLink} to="/" />
+            <Tab label="Profile" component={RouterLink} to="/profile" />
+            {isManager && <Tab label="Employees" component={RouterLink} to="/employees" />}
+          </Tabs>
           <Button color="inherit" onClick={handleSignOut}>
             Sign Out
           </Button>
         </Toolbar>
-        <Tabs 
-          value={value} 
-          onChange={handleChange} 
-          centered
-          textColor="inherit"
-          indicatorColor="secondary"
-        >
-          <Tab label="Dashboard" component={RouterLink} to="/" />
-          <Tab label="Profile" component={RouterLink} to="/profile" />
-          {isManager && <Tab label="Employees" component={RouterLink} to="/employees" />}
-        </Tabs>
       </AppBar>
       <Container sx={{ mt: 4 }}>
         <Outlet />

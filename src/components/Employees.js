@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import {
   Container,
   Typography,
@@ -35,7 +35,8 @@ const Employees = () => {
           // Fetch time off entries for each employee
           const timeOffQuery = query(
             collection(db, 'timeOffEntries'),
-            where('userId', '==', doc.id)
+            where('userId', '==', doc.id),
+            orderBy('startDate', 'asc')
           );
           const timeOffSnapshot = await getDocs(timeOffQuery);
           const timeOffEntries = timeOffSnapshot.docs.map(entry => ({
@@ -190,7 +191,7 @@ const Employees = () => {
                   <Card>
                     <CardContent>
                       <Typography variant="h6" gutterBottom>
-                        Time Off History
+                        Scheduled Time Off
                       </Typography>
                       {employee.timeOffEntries.length === 0 ? (
                         <Typography>No time off entries found.</Typography>
