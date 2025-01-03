@@ -37,17 +37,23 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import { DatePicker } from "@mui/x-date-pickers";
 import AddDaysModal from "./AddDaysModal";
 import EditTimeOffModal from "./EditTimeOffModal";
+import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 
 const holidays2025 = [
   { name: "New Year's Day", date: "2025-01-01" },
@@ -79,6 +85,9 @@ const Dashboard = () => {
   const [showAddDaysModal, setShowAddDaysModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [entryToEdit, setEntryToEdit] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const fetchUserData = async () => {
     try {
@@ -251,11 +260,18 @@ const Dashboard = () => {
     <Grid container spacing={3}>
       {/* Welcome Message */}
       <Grid item xs={12}>
-        <Paper sx={{ p: 3, display: "flex", flexDirection: "column" }}>
-          <Typography component="h1" variant="h4" gutterBottom>
+        <Paper sx={{ p: isMobile ? 2 : 3, display: "flex", flexDirection: "column" }}>
+          <Typography 
+            component="h1" 
+            variant={isMobile ? "h5" : "h4"} 
+            gutterBottom
+          >
             Welcome, {userData?.name}!
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography 
+            variant={isMobile ? "body2" : "subtitle1"} 
+            color="text.secondary"
+          >
             {userData?.jobLevel}
           </Typography>
         </Paper>
@@ -413,42 +429,79 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              2025 Holidays
-            </Typography>
-            <Grid container spacing={2}>
-              {holidays2025.map((holiday, index) => (
-                <Grid item xs={12} md={4} key={holiday.date}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      py: 1.5,
-                      px: 2,
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "divider",
-                      backgroundColor: "background.paper",
-                      transition: "all 0.2s ease-in-out",
-                      "&:hover": {
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
-                        borderColor: "primary.main",
-                      },
-                    }}
-                  >
-                    <Typography variant="body1">{holiday.name}</Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ ml: 2 }}
-                    >
-                      {format(parseISO(holiday.date), "MMM d")}
-                    </Typography>
-                  </Box>
+            {isMobile ? (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">2025 Holidays</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={.5}>
+                    {holidays2025.map((holiday) => (
+                      <Grid item xs={12} key={holiday.date}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            py: 1.5,
+                            px: 2,
+                            borderRadius: 1,
+                            border: 1,
+                            borderColor: 'divider',
+                            backgroundColor: 'background.paper',
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              borderColor: 'primary.main',
+                            },
+                          }}
+                        >
+                          <Typography variant="body1">{holiday.name}</Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                            {format(parseISO(holiday.date), 'MMM d')}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            ) : (
+              <>
+                <Typography variant="h6" gutterBottom>
+                  2025 Holidays
+                </Typography>
+                <Grid container spacing={2}>
+                  {holidays2025.map((holiday) => (
+                    <Grid item xs={12} md={4} key={holiday.date}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          py: 1.5,
+                          px: 2,
+                          borderRadius: 1,
+                          border: 1,
+                          borderColor: 'divider',
+                          backgroundColor: 'background.paper',
+                          transition: 'all 0.2s ease-in-out',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                            borderColor: 'primary.main',
+                          },
+                        }}
+                      >
+                        <Typography variant="body1">{holiday.name}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                          {format(parseISO(holiday.date), 'MMM d')}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
+              </>
+            )}
           </CardContent>
         </Card>
       </Grid>

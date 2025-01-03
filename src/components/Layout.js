@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, useLocation, Outlet } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box, Container, Tabs, Tab } from '@mui/material';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  Box, 
+  Container, 
+  Tabs, 
+  Tab,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+  Menu,
+  MenuItem
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +27,9 @@ const Layout = () => {
   const navigate = useNavigate();
   const [value, setValue] = useState(0);
   const [isManager, setIsManager] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const checkIfManager = async () => {
@@ -48,6 +66,19 @@ const Layout = () => {
     }
   };
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (path) => {
+    navigate(path);
+    handleMenuClose();
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -66,20 +97,50 @@ const Layout = () => {
               Time Off Tracker
             </Typography>
           </Box>
-          <Tabs 
-            value={value} 
-            onChange={handleChange} 
-            textColor="inherit"
-            indicatorColor="secondary"
-            sx={{ flexGrow: 1 }}
-          >
-            <Tab label="Dashboard" component={RouterLink} to="/" />
-            <Tab label="Profile" component={RouterLink} to="/profile" />
-            {isManager && <Tab label="Employees" component={RouterLink} to="/employees" />}
-          </Tabs>
-          <Button color="inherit" onClick={handleSignOut}>
-            Sign Out
-          </Button>
+          
+          {isMobile ? (
+            <>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuClick}
+                sx={{ ml: 'auto', mr: 1 }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={() => handleMenuItemClick('/')}>Dashboard</MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick('/profile')}>Profile</MenuItem>
+                {isManager && (
+                  <MenuItem onClick={() => handleMenuItemClick('/employees')}>Employees</MenuItem>
+                )}
+                <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <>
+              <Tabs 
+                value={value} 
+                onChange={handleChange} 
+                textColor="inherit"
+                indicatorColor="secondary"
+                sx={{ flexGrow: 1 }}
+              >
+                <Tab label="Dashboard" component={RouterLink} to="/" />
+                <Tab label="Profile" component={RouterLink} to="/profile" />
+                {isManager && <Tab label="Employees" component={RouterLink} to="/employees" />}
+              </Tabs>
+              <Button color="inherit" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       <Container sx={{ mt: 4 }}>
