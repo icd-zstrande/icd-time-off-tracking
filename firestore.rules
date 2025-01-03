@@ -11,46 +11,44 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    function isManager(userId) {
-      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(userId)) &&
-        get(/databases/$(database)/documents/users/$(userId)).data.managerId == request.auth.uid;
-    }
-
     // Users collection
     match /users/{userId} {
-      // Allow listing all users for manager selection
-      allow list: if isAuthenticated();
+      // Allow reading and listing users
+      allow list, read: if isAuthenticated();
       
-      allow read: if isAuthenticated() && 
-        (isOwner(userId) || 
-         isManager(userId));
-         
+      // Allow updating own document
       allow update: if isOwner(userId) && 
-        // Only allow updating specific fields
         request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['jobLevel', 'totalDays', 'managerId', 'updatedAt']);
-          
+      
+      // Allow creating own document during signup
       allow create: if isAuthenticated();
     }
 
-    // Time off entries
+    // Time off entries collection
     match /timeOffEntries/{entryId} {
       allow read: if isAuthenticated() && 
         (resource.data.userId == request.auth.uid || 
-         isManager(resource.data.userId));
+         exists(/databases/$(database)/documents/users/$(resource.data.userId)) &&
+         get(/databases/$(database)/documents/users/$(resource.data.userId)).data.managerId == request.auth.uid);
+      
       allow write: if isAuthenticated() && 
         request.resource.data.userId == request.auth.uid;
+      
       allow delete: if isAuthenticated() && 
         resource.data.userId == request.auth.uid;
     }
 
-    // Days adjustments
+    // Days adjustments collection
     match /daysAdjustments/{adjustmentId} {
       allow read: if isAuthenticated() && 
         (resource.data.userId == request.auth.uid || 
-         isManager(resource.data.userId));
+         exists(/databases/$(database)/documents/users/$(resource.data.userId)) &&
+         get(/databases/$(database)/documents/users/$(resource.data.userId)).data.managerId == request.auth.uid);
+      
       allow write: if isAuthenticated() && 
         request.resource.data.userId == request.auth.uid;
+      
       allow delete: if isAuthenticated() && 
         resource.data.userId == request.auth.uid;
     }

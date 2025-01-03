@@ -54,6 +54,7 @@ const Profile = () => {
           }
         }
       } catch (error) {
+        console.error('Error fetching user data:', error);
         toast.error('Error fetching user data');
       } finally {
         setLoading(false);
@@ -110,9 +111,9 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <Container>
-        <Typography>Loading...</Typography>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
@@ -153,8 +154,8 @@ const Profile = () => {
             onChange={(event, newValue) => {
               setSelectedManager(newValue);
             }}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            getOptionLabel={(option) => `${option.name} (${option.email})`}
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            getOptionLabel={(option) => option ? `${option.name} (${option.email})` : ''}
             options={allUsers}
             loading={loadingUsers}
             renderInput={(params) => (
