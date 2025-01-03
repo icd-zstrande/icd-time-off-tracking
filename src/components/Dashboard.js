@@ -234,7 +234,7 @@ const Dashboard = () => {
     );
   }
 
-  const remainingDays = userData ? userData.totalDays - userData.usedDays : 0;
+  // const remainingDays = userData ? userData.totalDays - userData.usedDays : 0;
   const usedDays = userData ? userData.usedDays : 0;
 
   return (
